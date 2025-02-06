@@ -31,6 +31,39 @@ class CustomerController extends Controller {
         return $this->render('index', ['customer' => $customer]);
     }
 
+    // CustomerController.php içinde ekleyeceğin method
+
+    public function actionGetCustomer()
+    {
+        $session = Yii::$app->session;
+        $customerId = $session->get('customer_id');
+
+        if (!$customerId) {
+            return $this->asJson([
+                'status' => 'error',
+                'message' => 'Müşteri kimliği bulunamadı.'
+            ]);
+        }
+
+        $customer = TicketBuyers::findOne(['_id' => new \MongoDB\BSON\ObjectID($customerId)]);
+
+        if ($customer) {
+            return $this->asJson([
+                'status' => 'success',
+                'name' => $customer->name,
+                'surname' => $customer->surname,
+                'email' => $customer->email,
+                'phone' => $customer->phone
+            ]);
+        } else {
+            return $this->asJson([
+                'status' => 'error',
+                'message' => 'Müşteri bilgileri bulunamadı.'
+            ]);
+        }
+    }
+
+
     public function actionPersonalInfo() {
         $customerId = Yii::$app->session->get('customer_id');
         if (!$customerId) {
