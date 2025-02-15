@@ -5,7 +5,7 @@ $this->title = 'Giriş Yap';
 ?>
 
 <div class="container mt-5" id="app">
-    <h2 class="text-center">Giriş Yap</h2>
+    <h2 class="text-center"><?=Yii::$app->session->get('i_name')?> Giriş Yap</h2>
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card shadow p-4">
@@ -21,7 +21,7 @@ $this->title = 'Giriş Yap';
                     <div class="tab-pane fade show active" id="phone-login" v-if="!isCodeSent">
                         <form @submit.prevent="sendSms">
                             <label for="phone" class="form-label">Telefon Numarası</label>
-                            <input type="text" v-model="phone" class="form-control" placeholder="+90xxxxxxxxxx" required>
+                            <input type="text" v-model="phone" class="form-control" placeholder="+90xxxxxxxxxx" required @input="validatePhone">
                             <div class="form-check mt-3">
                                 <input class="form-check-input" type="checkbox" id="kvkk-phone" v-model="kvkkAccepted">
                                 <label class="form-check-label" for="kvkk-phone">
@@ -80,6 +80,10 @@ $this->title = 'Giriş Yap';
             validateEmail() {
                 const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
                 this.emailError = !emailPattern.test(this.email);
+            },
+            validatePhone() {
+                const phonePattern = /^\+90\d{10}$/; // +90 ile başlayıp 10 hane rakam bekler
+                this.phoneError = !phonePattern.test(this.phone);
             },
             sendSms() {
                 this.phone = this.phone.replace(/\D/g, '');
@@ -144,7 +148,7 @@ $this->title = 'Giriş Yap';
                         this.countdown--;
                     } else {
                         clearInterval(timer);
-                        window.location.href = '<?= Url::to(['/ticket_sales/auth/login']) ?>';
+                        window.location.href = '<?= Url::to(['/ticket_sales/auth/login', 'in' => $in]) ?>';
                     }
                 }, 1000);
             }

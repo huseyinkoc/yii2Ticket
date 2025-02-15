@@ -30,12 +30,12 @@ $csrfToken = Yii::$app->request->csrfToken;
             <div class="container text-center mt-4">
                 <div class="row">
                     <div class="col-md-12">
-                        <a href="<?= Url::to(['/ticket_sales/customer/view-tickets']) ?>" class="card shadow p-4 text-decoration-none">
+                        <a href="<?= Url::to(['/ticket_sales/ticket/index']) ?>" class="card shadow p-4 text-decoration-none">
                             <h4>Satın Alınan Biletler</h4>
                         </a>
                     </div>
                     <div class="col-md-12 mt-3">
-                        <a href="<?= Url::to(['/ticket_sales/customer/buy-ticket']) ?>" class="card shadow p-4 text-decoration-none">
+                        <a href="<?= Url::to(['/ticket_sales/payment/buy-ticket']) ?>" class="card shadow p-4 text-decoration-none">
                             <h4>Bilet Satın Al</h4>
                         </a>
                     </div>

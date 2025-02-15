@@ -13,8 +13,11 @@ class AuthService
         $user = TicketBuyers::findByPhone($phone);
         if (!$user) {
             $user = new TicketBuyers();
+            $user->scenario = 'phone';
             $user->phone = $phone;
             $user->verified = false;
+            $user->i_number = Yii::$app->session->get('i_number');
+            $user->i_name = Yii::$app->session->get('i_name');
             $user->created_at = date('Y-m-d H:i:s');
             $user->save();
         }
@@ -35,8 +38,11 @@ class AuthService
         $user = TicketBuyers::findByEmail($email);
         if (!$user) {
             $user = new TicketBuyers();
+            $user->scenario = 'email';
             $user->email = $email;
             $user->verified = false;
+            $user->i_number = Yii::$app->session->get('i_number');
+            $user->i_name = Yii::$app->session->get('i_name');
             $user->created_at = date('Y-m-d H:i:s');
             $user->save();
         }
@@ -78,10 +84,13 @@ class AuthService
 
     public function logout()
     {
+        $iNumber = Yii::$app->session->get('i_number');
         Yii::$app->session->remove('customer_id');
         Yii::$app->session->remove('phone');
         Yii::$app->session->remove('email');
         Yii::$app->session->remove('ticket_login_code');
-        return ['status' => 'success', 'message' => 'Çıkış yapıldı'];
+        Yii::$app->session->remove('i_number');
+        Yii::$app->session->remove('i_name');
+        return ['status' => 'success', 'i_number'=>$iNumber, 'message' => 'Çıkış yapıldı'];
     }
 }

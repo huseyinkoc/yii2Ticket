@@ -16,7 +16,7 @@ class BaseController extends Controller
     public function beforeAction($action)
     {
         if (!Yii::$app->session->has('customer_id') && !in_array($action->id, $this->allowActions)) {
-            return $this->redirect(['/ticket_sales/auth/login'])->send();
+            return $this->redirect(['/ticket_sales/auth/login', 'in' => Yii::$app->session->get('i_number')])->send();
         }
         return parent::beforeAction($action);
     }

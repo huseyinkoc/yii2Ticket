@@ -47,10 +47,10 @@ $this->beginPage();
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= Url::to(['/ticket_sales/auth/login']) ?>">Ana Sayfa</a>
+                        <a class="nav-link" href="<?= Url::to(['/ticket_sales/auth/login?in='.Yii::$app->session->get('i_number')]) ?>">Ana Sayfa</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= Url::to(['/ticket_sales/ticket/buy']) ?>">Bilet Satın Al</a>
+                        <a class="nav-link" href="<?= Url::to(['/ticket_sales/payment/buy-ticket']) ?>">Bilet Satın Al</a>
                     </li>
                     <?php if (Yii::$app->session->has('customer_id')): ?>
                         <li class="nav-item">

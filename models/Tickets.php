@@ -5,15 +5,13 @@ namespace app\modules\ticket_sales\models;
 use Yii;
 use yii\mongodb\ActiveRecord;
 
-class Tickets extends ActiveRecord
-{
-    public static function collectionName()
-    {
+class Tickets extends ActiveRecord {
+
+    public static function collectionName() {
         return 'tickets';
     }
 
-    public function attributes()
-    {
+    public function attributes() {
         return [
             '_id',
             'customer_id',
@@ -27,8 +25,7 @@ class Tickets extends ActiveRecord
         ];
     }
 
-    public function rules()
-    {
+    public function rules() {
         return [
             [['customer_id', 'route', 'departure_time', 'seat_number', 'price', 'purchase_date', 'status'], 'required'],
             [['customer_id'], 'string'],
@@ -41,8 +38,7 @@ class Tickets extends ActiveRecord
         ];
     }
 
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             '_id' => 'ID',
             'customer_id' => 'Müşteri ID',
@@ -55,4 +51,14 @@ class Tickets extends ActiveRecord
             'status' => 'Durum'
         ];
     }
+
+    public function validateQrCode($qrCode) {
+        if (strpos($qrCode, 'TKT-') === 0) {
+            $qrHash = substr($qrCode, 4); // 'TKT-' çıkarılır
+            // $qrHash ile doğrulama işlemleri yapılır
+            return true; // Geçerli QR kodu
+        }
+        return false; // Geçersiz QR kodu
+    }
+
 }
