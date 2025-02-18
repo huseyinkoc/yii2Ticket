@@ -5,9 +5,9 @@ namespace app\modules\ticket_sales\controllers;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
-use app\models\Tickets;
+use app\modules\ticket_sales\models\Tickets;
 use app\models\Payments;
-use app\models\TicketBuyers;
+use app\modules\ticket_sales\models\TicketBuyers;
 use app\modules\yonetim\models\Kurumlar;
 use app\modules\yonetim\models\UlasimUcretleri;
 use app\modules\yonetim\models\Sanalposlar;
@@ -175,9 +175,23 @@ class PaymentController extends Controller {
                     $ticket->customer_id = Yii::$app->session->get('customer_id');
                     $ticket->order_id = $orderId;
                     $ticket->price = $amount / 100;
+                    $ticket->client_id = $mId;
                     $ticket->auth_code = $confirmVeri->authCode;
                     $ticket->hostlog_key = $confirmVeri->hostlogkey;
                     $ticket->qr_code = $this->generateQrCode($ticket);
+                    $ticket->status = Tickets::ACTIVE;
+                    $ticket->created_at = date('Y-m-d H:i:s');
+                    $ticket->expires_at = date('Y-m-d H:i:s', strtotime('+'.Tickets::EXP_TIME.' hours')); // 24 saat sonra
+                    
+                    $reponseTxt = 'Türü:' . 'QR Bilet';
+                    $reponseTxt = ', Sipariş Num:' . $orderId;
+                    $reponseTxt .= ', ClientId:' . $mId;
+                    $reponseTxt .= ', RefNum:' . $confirmVeri->hostlogkey;
+                    $reponseTxt .= ', Onay Kodu:' . $confirmVeri->authCode;
+                    $reponseTxt .= ', TUTAR:' . floatval($ticket->price);
+                    
+                    $ticket->response_txt = $reponseTxt;
+                    
 
                     if ($ticket->save()) {
                         $status = 'success';
@@ -248,56 +262,10 @@ class PaymentController extends Controller {
         }
     }
 
-    // 💳 3. Ödeme İşlemi ve 3D Secure Entegrasyonu
-    public function actionMakePayment() {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $request = Yii::$app->request->post();
-
-        // Kart bilgileri ve fiyat kontrolü
-        $cardHolder = $request['card_holder'];
-        $cardNumber = $request['card_number'];
-        $expiryDate = $request['expiry_date'];
-        $cvv = $request['cvv'];
-        $price = $request['price'];
-        $routeName = $request['route_name'];
-
-        // 🔐 3D Secure İşlemi Simülasyonu
-        $paymentStatus = $this->process3DSecure($cardNumber, $cvv, $price);
-
-        if ($paymentStatus === 'success') {
-            // 🎟️ Bilet Oluşturma
-            $ticket = new Tickets();
-            $ticket->route_name = $routeName;
-            $ticket->price = $price;
-            $ticket->buyer_id = Yii::$app->session->get('customer_id');
-            $ticket->qr_code = $this->generateQrCode();
-            $ticket->created_at = date('Y-m-d H:i:s');
-            $ticket->save();
-
-            return [
-                'status' => 'success',
-                'message' => 'Ödeme başarılı!',
-                'ticket_id' => $ticket->id,
-                'qr_code' => $ticket->qr_code,
-            ];
-        } else {
-            return [
-                'status' => 'error',
-                'message' => 'Ödeme başarısız. Lütfen tekrar deneyin.',
-            ];
-        }
-    }
-
-    // 🧪 4. 3D Secure Simülasyonu (Gerçek Banka API'si ile entegre edilebilir)
-    private function process3DSecure($cardNumber, $cvv, $price) {
-        // Burada 3D Secure API ile gerçek entegrasyon yapılabilir.
-        // Şimdilik başarılı bir ödeme simüle ediyoruz.
-        return 'success';
-    }
-
+    
     // 🎟️ 5. Benzersiz QR Kod Üretimi
     private function generateQrCode($ticket) {
-        $prefix = "TKT-"; // QR kodlarının başına eklenecek tanımlayıcı
+        $prefix = "02TCK"; // QR kodlarının başına eklenecek tanımlayıcı
         return $prefix . md5($ticket->customer_id . $ticket->order_id . time());
     }
 

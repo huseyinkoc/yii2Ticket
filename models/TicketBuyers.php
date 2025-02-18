@@ -58,6 +58,7 @@ class TicketBuyers extends ActiveRecord
         }
     }
 
+    
     public static function findByPhone($phone)
     {
         return self::find()->where(['phone' => $phone])->one();
@@ -66,6 +67,15 @@ class TicketBuyers extends ActiveRecord
     public static function findByEmail($email)
     {
         return self::find()->where(['email' => $email])->one();
+    }
+    
+     /**
+     * Müşteri ID ile e-posta adresini getir
+     */
+    public static function getEmailById($customerId)
+    {
+        $customer = self::findOne($customerId);
+        return $customer ? $customer->email : null;
     }
 
     public function getTickets()
