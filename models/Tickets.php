@@ -83,13 +83,14 @@ class Tickets extends ActiveRecord {
                     $balanceStatus = $kartYHObj->gurselEYukleme($kartNum, $model->price, $model->auth_code, $model->hostlog_key, $model->response_txt);
                     if(!$balanceStatus){
                         return null;
-                    } else {
-                        $ticketBuyerObj = TicketBuyers();
-                        $email = $ticketBuyerObj->getEmailById($model->customer_id);
-                        $faturaYObj = new FaturaliYuklemeler();
-                        $faturaYObj->faturaBilgisiKaydet($kartNum, $faturaYObj::FATURA_ISLEMI_YUKLEME, $faturaYObj::FATURA_ISLEM_TURU_QR_KAGIT_BILET, null, $model->client_id, $model->order_id, $model->price, $email);
-                        
-                    }
+                    } 
+//                    else {
+//                        $ticketBuyerObj = TicketBuyers();
+//                        $email = $ticketBuyerObj->getEmailById($model->customer_id);
+//                        $faturaYObj = new FaturaliYuklemeler();
+//                        $faturaYObj->faturaBilgisiKaydet($kartNum, $faturaYObj::FATURA_ISLEMI_YUKLEME, $faturaYObj::FATURA_ISLEM_TURU_QR_KAGIT_BILET, null, $model->client_id, $model->order_id, $model->price, $email);
+//                        
+//                    }
                     $changedStatus = self::USED;
                 }
                 return (string) $model->customer_id;            

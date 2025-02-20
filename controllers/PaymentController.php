@@ -11,6 +11,7 @@ use app\modules\ticket_sales\models\TicketBuyers;
 use app\modules\yonetim\models\Kurumlar;
 use app\modules\yonetim\models\UlasimUcretleri;
 use app\modules\yonetim\models\Sanalposlar;
+use app\modules\yonetim\models\FaturaliYuklemeler;
 
 class PaymentController extends Controller {
 // CSRF korumasını belirli actionlarda devre dışı bırak
@@ -183,8 +184,9 @@ class PaymentController extends Controller {
                     $ticket->created_at = date('Y-m-d H:i:s');
                     $ticket->expires_at = date('Y-m-d H:i:s', strtotime('+'.Tickets::EXP_TIME.' hours')); // 24 saat sonra
                     
-                    $reponseTxt = 'Türü:' . 'QR Bilet';
-                    $reponseTxt = ', Sipariş Num:' . $orderId;
+                    
+                    $reponseTxt = 'Sipariş Num:' . $orderId;
+                    $reponseTxt .= ', Türü:' . 'QR Bilet';
                     $reponseTxt .= ', ClientId:' . $mId;
                     $reponseTxt .= ', RefNum:' . $confirmVeri->hostlogkey;
                     $reponseTxt .= ', Onay Kodu:' . $confirmVeri->authCode;
@@ -194,6 +196,15 @@ class PaymentController extends Controller {
                     
 
                     if ($ticket->save()) {
+                        $cardNum = $ticket->customer_id;
+                        
+                        $ticketBuyerObj = TicketBuyers();
+                        $email = $ticketBuyerObj->getEmailById($ticket->customer_id);
+                        
+                        $invoiceObj = new FaturaliYuklemeler();
+                        $invoiceObj->faturaBilgisiKaydet($cardNum, $invoiceObj::FATURA_ISLEMI_YUKLEME, $invoiceObj::FATURA_ISLEM_TURU_QR_KAGIT_BILET, null, $mId, $orderId, $ticket->price, $email);
+                        
+                        
                         $status = 'success';
                         $message = "Ödeme başarıyla tamamlandı. Sipariş No: {$orderId}";
                     } else {
